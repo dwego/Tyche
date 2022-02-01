@@ -1,7 +1,23 @@
+from unittest import result
 from vosk import Model, KaldiRecognizer
 import os
 import pyaudio
+import json
+import pyttsx3
+import core
 
+
+# Sintese de fala
+engine = pyttsx3.init()
+
+voices = engine.getProperty('voices')
+engine.setProperty('voice', voices[-1].id)
+
+def speak(text):
+    engine.say(text)
+    engine.runAndWait()
+
+# Reconhecimento de voz
 model = Model("model")
 rec = KaldiRecognizer(model, 16000)
 
@@ -9,13 +25,21 @@ p = pyaudio.PyAudio()
 stream = p.open(format=pyaudio.paInt16, channels=1, rate=16000, input=True, frames_per_buffer=8000)
 stream.start_stream()
 
+# Loop do Reconhecimento de voz
 while True:
-    data = stream.read(4000)
+    data = stream.read(4000, exception_on_overflow=False)
+
     if len(data) == 0:
         break
     if rec.AcceptWaveform(data):
-        print(rec.Result())
-    else:
-        print(rec.PartialResult())
+        result = rec.Result()
+        result = json.loads(result)
 
-print(rec.FinalResult())
+        if result is not None:
+            text =  result['text']
+        
+        print(text)
+        speak(text)
+
+        if text == 'que horas são' or text =='me diga as horas' or text =='horas são':
+            speak(core.SystemInfo.get_time())
