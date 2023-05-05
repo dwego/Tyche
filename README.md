@@ -17,7 +17,7 @@ pip install pyaudio
 pip install requests
 ```
 # Usage
-To use the virtual assistant, simply run the assistant.py script in your terminal using the following command:
+To use the virtual assistant, simply run the main.py script in your terminal using the following command:
 
 ```
 python main.py
